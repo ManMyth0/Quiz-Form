@@ -5,6 +5,8 @@
   <title>Form</title>
 </head>
 <body>
+  <h2><b>Make a new Quiz Here:</b></h2>
+  <br>
   <form id="myForm">
     <input type="text" name="quizName" placeholder="Enter a name for the Quiz" required><br>
     <input type="text" name="question" placeholder="Enter a question" required><br>
@@ -14,13 +16,15 @@
     <input type="text" name="fakeAnswer3" placeholder="Enter fake answer 3" required><br>
     <button type="submit">Submit</button>
   </form>
-  <script>document.getElementById('myForm').addEventListener('submit', async (e) => {
+  <script>
+  document.getElementById('myForm').addEventListener('submit', async (e) => {
     e.preventDefault();
   
     const formData = new FormData(document.getElementById('myForm'));
     const data = {};
   
-    let fakeAnswers = []; // Initialize the fakeAnswers array
+    // Initialize the fakeAnswers array
+    let fakeAnswers = [];
   
     // Extract and organize data from the form
     formData.forEach((value, key) => {
@@ -39,7 +43,7 @@
     // Assign the fakeAnswers array to the data object
     data['fakeAnswers'] = fakeAnswers;
   
-    // Send data to the server
+    // Send data to the server with fetch
     const response = await fetch('/quizForm/save', {
       method: 'POST',
       headers: {
