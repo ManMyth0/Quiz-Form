@@ -1,0 +1,24 @@
+{
+  "name": "online-quiz-system",
+  "version": "1.0.0",
+  "description": "This is a simple system to interact with when using CRUD commands / generating + altering for an online quiz",
+  "main": "mainApp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "online",
+    "quiz",
+    "system",
+    "generator"
+  ],
+  "author": "Anthony Dearing",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.3",
+    "nodemon": "^3.0.2"
+  }
+}
