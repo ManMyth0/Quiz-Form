@@ -4,7 +4,8 @@ const { connectToMongoDB } = require('../connections/connectToDB.js');
 const router = express.Router();
 
 router.post('/quizForm/save', async (req, res) => {
-    try {
+    try 
+    {
         const { collection } = await connectToMongoDB();
 
         // Extracting form data and mapping it to the structure of the Quiz model
@@ -23,13 +24,15 @@ router.post('/quizForm/save', async (req, res) => {
 
         if (saveResult.acknowledged === true) 
         {
-            res.json({ message: `Successfully added`, data: saveResult });
+            res.status(200)
+                .json({ message: `Successfully added`, data: saveResult });
             console.log(saveResult);
         } 
         
         else 
         {
-            res.json({ message: `Failed to add` });
+            res.status(404)
+                .json({ message: `Failed to add` });
         }
     } 
     
