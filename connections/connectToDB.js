@@ -6,6 +6,7 @@ const { MongoClient } = require("mongodb");
 async function connectToMongoDB() {
     try 
     {
+        // replace URI, database and collection with your own
         const URI = process.env.URI;
         const client = new MongoClient( URI );
         const database = client.db("First-Cluster");
