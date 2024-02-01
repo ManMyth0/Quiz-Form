@@ -1,6 +1,5 @@
 // this will be the mongoose schema model for how a quiz will be set up
-// the quiz will allow for 1 question, 1 correct answer, and 3 incorrect answers to chosen from for now
-// will add scalability for added questions, answers and fakeAnswers later on
+// the quiz will allow for 1 question, 1 correct answer, and 3 incorrect answers to choose from
 
 const mongoose = require('mongoose');
 // will store the type as mixed to allow for flexibility for question and answers to be numbers, strings etc...
