@@ -1,4 +1,4 @@
-/* I've placed all the functions linked to the viewQuiz file's buttons here, in a single file, rather than a bunch of smaller files. This just for convenience
+/* I've placed all the functions linked to the viewQuiz's file buttons here, in a single file, rather than a bunch of smaller files. This just for convenience
     so this file might look junky. */
 
     async function getQuizData() {
