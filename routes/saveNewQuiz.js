@@ -3,43 +3,43 @@ const express = require('express');
 const { connectToMongoDB } = require('../connections/connectToDB.js');
 const router = express.Router();
 
+// Route to save a quiz model instance to designated DB collection
 router.post('/quizForm/save', async (req, res) => {
-    try 
-    {
+    try {   
         const { collection } = await connectToMongoDB();
 
-        // Extracting form data and mapping it to the structure of the Quiz model
-        const quizData = {
+        /* Extracting form data and mapping it to the structure of the Quiz model to ensure correct
+            structure that the model expects */
+        const quizData = 
+        {
             quizName: req.body.quizName,
-            quizForm: [{
-                question: req.body.question,
-                correctAnswer: req.body.correctAnswer,
-                fakeAnswers: [
-                    req.body.fakeAnswers
-                ]
-            }]
+            quizForm: req.body.quizSet.map((question) => {
+                return {
+                    question: question.question,
+                    correctAnswer: question.correctAnswer,
+                    fakeAnswers: [question.fakeAnswer1, question.fakeAnswer2, question.fakeAnswer3],
+                };
+            }),
         };
 
         const saveResult = await collection.insertOne(new Quiz(quizData));
 
         if (saveResult.acknowledged === true) 
         {
-            res.status(200)
-                .json({ message: `Successfully added`, data: saveResult });
+            res.json({ message: 'Successfully added', data: saveResult });
             console.log(saveResult);
         } 
         
         else 
         {
-            res.status(404)
-                .json({ message: `Failed to add` });
+            res.json({ message: 'Failed to add' });
         }
     } 
     
     catch (err) 
     {
         res.status(500).json({ error: err });
-        console.error(`Failed to save to DB:`, err);
+        console.error('Failed to save to DB:', err);
     }
 });
 

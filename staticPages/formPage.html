@@ -5,65 +5,114 @@
   <title>Form</title>
 </head>
 <body>
-  <h2><b>Make a new Quiz Here:</b></h2>
-  <br>
   <form id="myForm">
-    <input type="text" name="quizName" placeholder="Enter a name for the Quiz" required><br>
-    <input type="text" name="question" placeholder="Enter a question" required><br>
-    <input type="text" name="correctAnswer" placeholder="Enter correct answer" required><br>
-    <input type="text" name="fakeAnswer1" placeholder="Enter fake answer 1" required><br>
-    <input type="text" name="fakeAnswer2" placeholder="Enter fake answer 2" required><br>
-    <input type="text" name="fakeAnswer3" placeholder="Enter fake answer 3" required><br>
-    <button type="submit">Submit</button>
+    <br>
+    <h2>Create a Quiz Set:</h2>
+    <label for="quizName">Enter a name for the Quiz Set:</label>
+    <input type="text" id="quizName" name="quizName" placeholder="Enter a name for the Quiz Set" required><br>
+    <br>
+    <label for="quizCount">Enter the number of questions you want between 5-25:</label>
+    <input type="number" id="quizCount" name="quizCount" min="5" max="25" required><br>
+    <button type="button" id="startButton">Start</button>
   </form>
+
   <script>
-  document.getElementById('myForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-  
-    const formData = new FormData(document.getElementById('myForm'));
-    const data = {};
-  
-    // Initialize the fakeAnswers array
-    let fakeAnswers = [];
-  
-    // Extract and organize data from the form
-    formData.forEach((value, key) => {
-      if (key === 'fakeAnswer1' || key === 'fakeAnswer2' || key === 'fakeAnswer3') {
-        // Push fake answers to the array
-        fakeAnswers.push(value);
-      } 
-      
-      else 
+    document.getElementById('startButton').addEventListener('click', async () => {
+      const quizName = document.getElementById('quizName').value;
+      const quizCount = document.getElementById('quizCount').value;
+
+      // Validate if quizCount is a number between 5 and 25
+      if (isNaN(quizCount) || quizCount < 5 || quizCount > 25) 
       {
-        // For other fields like quizName, question, correctAnswer
-        data[key] = value;
+        alert('Please enter a number between 5 and 25 for the number of questions.');
+        return;
+      }
+
+      // Hide the start button
+      document.getElementById('startButton').style.display = 'none';
+
+      // Create a final submit button to save the entire quiz set
+      const finalSubmitButton = document.createElement('button');
+      finalSubmitButton.type = 'button';
+      finalSubmitButton.textContent = 'Save Quiz Set';
+      finalSubmitButton.addEventListener('click', async () => {
+        // Gather all the form data for each question
+        const formDataArray = [];
+
+        for (let i = 1; i <= quizCount; i++) {
+          const formData = new FormData(document.getElementById(`form${i}`));
+          const data = {
+            question: formData.get('question'),
+            correctAnswer: formData.get('correctAnswer'),
+            fakeAnswer1: formData.get('fakeAnswer1'),
+            fakeAnswer2: formData.get('fakeAnswer2'),
+            fakeAnswer3: formData.get('fakeAnswer3')
+          };
+
+          formDataArray.push(data);
+        }
+
+        // Save the entire quiz set under a single ID in the database
+        const response = await fetch('/quizForm/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            quizName,
+            quizSet: formDataArray
+          })
+        });
+
+        if (response.ok) 
+        {
+          console.log('Quiz Set saved to collection!', response);
+          alert(`Saved Successfully!`);
+
+          // Show the submitAnotherQuizBtn button after submitting the quiz
+          submitAnotherQuizBtn.removeAttribute('hidden');
+          finalSubmitButton.disabled = true; // Disable the button after submission
+        } 
+        
+        else 
+        {
+          console.error('Failed to save Quiz Set');
+        }
+      });
+
+      // Append the final submit button to the body
+      document.body.appendChild(finalSubmitButton);
+
+      // Create form elements for each question based on the selected number
+      for (let i = 1; i <= quizCount; i++) {
+        const form = document.createElement('form');
+        form.id = `form${i}`;
+        form.innerHTML =
+          '<br>' +
+          `<h4>Question ${i}:</h4>` +
+          `<input type="text" name="question" placeholder="Enter a question" required><br>` +
+          `<input type="text" name="correctAnswer" placeholder="Enter correct answer" required><br>` +
+          `<input type="text" name="fakeAnswer1" placeholder="Enter fake answer 1" required><br>` +
+          `<input type="text" name="fakeAnswer2" placeholder="Enter fake answer 2" required><br>` +
+          `<input type="text" name="fakeAnswer3" placeholder="Enter fake answer 3" required><br>`;
+
+        // Append the form to the body
+        document.body.appendChild(form);
       }
     });
-  
-    // Assign the fakeAnswers array to the data object
-    data['fakeAnswers'] = fakeAnswers;
-  
-    // Send data to the server with fetch
-    const response = await fetch('/quizForm/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+
+    // Create the submitAnotherQuizBtn button
+    const submitAnotherQuizBtn = document.createElement('button');
+    submitAnotherQuizBtn.type = 'button';
+    submitAnotherQuizBtn.textContent = 'Submit Another Quiz';
+    submitAnotherQuizBtn.hidden = true; // Hide initially
+    submitAnotherQuizBtn.addEventListener('click', () => {
+      // Reload the page to start another quiz
+      location.reload();
     });
-  
-    if (response.ok) 
-    {
-      console.log('Form submitted successfully');
-      // Optionally, perform actions after successful submission
-    } 
-    
-    else 
-    {
-      console.error('Failed to submit form');
-      // Optionally, handle failed submission
-    }
-  });  
-  </script>  
+
+    // Append the submitAnotherQuizBtn button to the body
+    document.body.appendChild(submitAnotherQuizBtn);
+  </script>
 </body>
 </html>

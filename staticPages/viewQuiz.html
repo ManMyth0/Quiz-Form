@@ -1,133 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<!-- This HTML file is just to ensure functionality of the backend 
+      so I've left some functions below that don't pertain the the submit button's usage. -->
+
 <head>
   <meta charset="UTF-8">
   <title>Quiz Viewer</title>
+
+  <!-- Directly include the functions for the buttons -->
+  <script defer src="src/viewQuizFunctionList.js"></script>
+
 </head>
 <body>
-  <h1>Quiz Viewer</h1>
-
-  <label for="quizId">Enter Quiz ID:</label>
-  <input type="text" id="quizId" placeholder="Enter the Quiz ID for retrieval"><br>
-
-  <button id="fetchQuizBtn" onclick="getQuizData()">Fetch Quiz</button>
+  <h1>Quiz Viewer and Editor</h1>
+  
+  <label for="quizId">Take A Quiz by it's ID:</label>
+  <input type="text" id="quizId" placeholder="Enter the Quiz ID here">
+  <br>
+  <button id="fetchQuizBtn" onclick="getQuizData()">Take A Quiz</button>
+  <br><br><br>
+  <label for="fetchAQuiz">Don't know the quiz ID? Find all your Quizzes here:</label>
+  <br>
+  <button id="fetchAllQuizzesBtn" onclick="fetchAllQuizzes()">Fetch All Quizzes</button>
+  <br><br><br>
+  <label for="addQuestion">Want to add a Question to a Quiz?:</label>
+  <br>
+  <button id="addQuestionBtn" onclick="addQuestion()">Add a Quiz Question</button>
+  <br><br><br>
+  <label for="modifyQuizQuestion">Need to modify a Quiz Question?:</label>
+  <br>
+  <button id="modifyQuizQuestionBtn" onclick="modifyQuizQuestion()">Modify Quiz Question</button>
+  <br><br><br>
+  <label for="deleteQuestion">Need to delete a Question from a Quiz?:</label>
+  <br>
+  <button id="deleteQuestionBtn" onclick="deleteQuestion()">Delete Quiz Question</button>
+  <br><br><br>
+  <label for="deleteQuiz">Want to delete the entire Quiz from the collection?</label>
+  <br>
+  <button id="deleteQuizBtn" onclick="deleteQuiz()">Delete a Quiz</button>
 
   <script>
-    // Global array to store fetched quiz IDs
-    const fetchedQuizIds = [];
+    // Store fetched quiz windows
+    const quizWindows = [];
 
-    async function getQuizData() {
-      try {
-        const quizId = document.getElementById('quizId').value;
+    // Store scores for each quiz
+    const quizScores = {};
 
-        // Validate if the entered quiz ID is not empty
-        if (!quizId) {
-          alert('Please enter a Quiz ID');
-          return;
-        }
+    // Store the total number of questions in the quiz
+    let totalQuestions = 0;
 
-        // Check if the ID has been fetched before
-        if (!fetchedQuizIds.includes(quizId)) {
-          // Fetch the quiz data using the provided route
-          const fetchResponse = await fetch(`/getQuiz/${quizId}`);
-          const returnedData = await fetchResponse.json();
+    function displayQuizInfo(window, quizName) {
+      // Use paragraph elements for Quiz name in the new window / tab
+      const quizNameElement = window.document.createElement('p');
+      quizNameElement.innerHTML = `<b style="font-size: larger">${ quizName }</b>`;
+      window.document.body.appendChild(quizNameElement);
+    }
 
-          if (fetchResponse.ok) {
-            // Extract Quiz name, question, correct answer, and fake answers
-            const quizName = returnedData.data.quizName;
-            const question = returnedData.data.quizForm[0].question;
-            const correctAnswer = returnedData.data.quizForm[0].correctAnswer;
-            const fakeAnswers = returnedData.data.quizForm[0].fakeAnswers;
+    // Quiz score Keeping functionality:
+    function checkSelectedAnswers(window, questions, quizName, submitButton) {
+    let unansweredQuestions = 0;
 
-            // Display Quiz name and Question
-            displayQuizInfo(quizName, question);
+    // Loop through each question in the new window or tab
+    questions.forEach((questionData, index) => {
+    const selectedRadio = window.document.querySelector(`input[name="answers${ index + 1 }"]:checked`);
 
-            // Combine correct answer and extracted fake answers into a new array
-            const answers = [correctAnswer, ...fakeAnswers[0]];
+    // Check if a radio button was selected for the current question
+    if (selectedRadio) 
+    {
+      // Increment the total count for the quiz
+      quizScores[quizName].total++;
 
-            // Shuffle the answers array using Fisher-Yates (Knuth) Shuffle algorithm
-            // so that the answers appear in different orders every time a quiz is retrieved
-            for (let i = answers.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [answers[i], answers[j]] = [answers[j], answers[i]];
-            }
-
-            // Create a list and append each answer as a radio button with label
-            const form = document.createElement('form');
-
-            for (let answer of answers) {
-              const inputRadio = document.createElement('input');
-              inputRadio.type = 'radio';
-              inputRadio.value = answer;
-              inputRadio.name = 'answers';
-
-              const label = document.createElement('label');
-              label.innerHTML = answer;
-
-              form.appendChild(inputRadio);
-              form.appendChild(label);
-              form.appendChild(document.createElement('br'));
-            }
-
-            document.body.appendChild(form);
-
-            // Create a submit button to check the selected answer
-            const submitButton = document.createElement('button');
-            submitButton.textContent = 'Submit Answers';
-            submitButton.addEventListener('click', () => {
-              checkSelectedAnswer(correctAnswer);
-              disableFetchQuizButton(quizId);
-            });
-
-            document.body.appendChild(submitButton);
-
-            // Push the new ID into the global array
-            fetchedQuizIds.push(quizId);
-
-          } else {
-            alert ('No Quiz by that ID was found!');
-            console.error('Failed to fetch quiz data');
-          }
-        } else {
-          alert('Quiz already fetched. Please enter a new Quiz ID.');
-        }
-      } catch (error) {
-        console.error('Error fetching quiz data:', error);
+      // Compare submitted answer with correct answer
+      if (selectedRadio.value === questionData.correctAnswer) 
+      {
+        // Increment the correct count for the quiz
+        quizScores[quizName].correct++;
+      } 
+      
+      else 
+      {
+        // Increment the incorrect count for the quiz
+        quizScores[quizName].incorrect++;
       }
+    } 
+    
+    else 
+    {
+      unansweredQuestions++;
+    }
+  });
+
+    // Check if all questions are answered
+    if (unansweredQuestions === 0) 
+    {
+    // Disable radio buttons and submit button after submission
+      questions.forEach((_, index) => {
+        const radioButtons = window.document.querySelectorAll(`input[name="answers${ index + 1 }"]`);
+        radioButtons.forEach(radio => radio.disabled = true);
+      });
+      submitButton.disabled = true;
+
+      // Display the score details after quiz is finished
+      window.alert(`Score: ${ calculatePercentage(quizName) }%\n
+        You got ${ quizScores[quizName].correct } questions Correct and \n
+        You got ${ quizScores[quizName].incorrect } questions Wrong!`);
+    } 
+    
+    else 
+    {
+      // Display a general message for unanswered questions
+      window.alert('Please make sure all questions have an answer selected before submitting.');
+    }
+}
+
+    function calculatePercentage(quizName) {
+      return ((quizScores[quizName].correct / totalQuestions) * 100).toFixed(2);
     }
 
-    function displayQuizInfo(quizName, question) {
-      // Use paragraph elements for Quiz name and Question
-      const quizNameElement = document.createElement('p');
-      quizNameElement.innerHTML = `<b style="font-size: larger">${quizName}</b>`;
-      document.body.appendChild(quizNameElement);
+    // Resetting the quiz score
+    function resetQuizScore(quizName) {
 
-      const questionElement = document.createElement('p');
-      questionElement.innerHTML = `<b>${question}</b>`;
-      document.body.appendChild(questionElement);
+    quizScores[quizName] = 
+    {
+      total: 0,
+      correct: 0,
+      incorrect: 0
+    };
+  }
+
+  function displayAllQuizzes(window, data) {
+  
+    if (data.message === 'Quizzes Found!') 
+    {
+      // Use an unordered list for displaying quizzes
+      const ul = window.document.createElement('ul');
+
+      data.data.forEach((quiz, index) => {
+      const li = window.document.createElement('li');
+
+      // Display Quiz Name with associated ID
+      const quizNameElement = window.document.createElement('p');
+      quizNameElement.innerHTML = `<b>Quiz Name:</b> ${ quiz.quizName }`;
+      li.appendChild(quizNameElement);
+
+      const quizIdElement = window.document.createElement('p');
+      quizIdElement.innerHTML = `<b>Quiz ID:</b> ${ quiz._id }`;
+      li.appendChild(quizIdElement);
+
+      ul.appendChild(li);
+    });
+
+    window.document.body.appendChild(ul);
+    
+    } 
+  
+    else 
+    {
+      // Display an alert if no quizzes are found
+      window.alert(data.message);
+    }
+}
+  
+// Disable fetchQuizBtn button if the submitted ID has already been fetched and stored
+  function disableFetchQuizButton(quizId) {
+      document.getElementById('fetchQuizBtn').disabled = quizId === quizWindows.includes(quizId);
     }
 
-    function checkSelectedAnswer(correctAnswer) {
-      // Get the checked radio button
-      const selectedRadio = document.querySelector('input[name="answers"]:checked');
-
-      // Check if a radio button was selected
-      if (selectedRadio) {
-        // Compare submitted answer with correct answer
-        if (selectedRadio.value === correctAnswer) {
-          alert('Correct!');
-        } else {
-          alert('Incorrect! Try again.');
-        }
-      } else {
-        alert('Please select an answer before submitting.');
-      }
-    }
-
-    // Disable fetchQuizBtn button if the submitted ID has already been fetched and stored
-    function disableFetchQuizButton(quizId) {
-      document.getElementById('fetchQuizBtn').disabled = quizId === fetchedQuizIds[fetchedQuizIds];
-    }
   </script>
 </body>
 </html>
