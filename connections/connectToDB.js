@@ -9,8 +9,9 @@ async function connectToMongoDB() {
         // replace URI, database and collection with your own
         const URI = process.env.URI;
         const client = new MongoClient( URI );
+        // replace the database and collection with your own
         const database = client.db("Replace with your own MongoDB Cluster");
-        const collection = database.collection("Replace  with your own Collection");
+        const collection = database.collection("Replace with your own Collection");
 
         // connect to mongoDB
         await client.connect();
