@@ -9,8 +9,8 @@ async function connectToMongoDB() {
         // replace URI, database and collection with your own
         const URI = process.env.URI;
         const client = new MongoClient( URI );
-        const database = client.db("First-Cluster");
-        const collection = database.collection("quizForms");
+        const database = client.db("Replace with your own MongoDB Cluster");
+        const collection = database.collection("Replace  with your own Collection");
 
         // connect to mongoDB
         await client.connect();
@@ -18,7 +18,7 @@ async function connectToMongoDB() {
         // console.log('Connected to MongoDB!');
 
         // so far only the collection variable is required as dynamic integration
-        // just incase we want to use the other variables elsewhere outside the function we return the rest here
+        // just incase we want to use the other variables elsewhere, we return the rest for use:
         return { client, database, collection };
     } 
     
