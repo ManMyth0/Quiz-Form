@@ -9,7 +9,7 @@ const quizSchema = new mongoose.Schema({
     quizName: {
         type: String,
         required: [true, 'Please provide a name for the form'],
-        unique: true    // help ensure each quiz name is unique
+        unique: true
     },
 
     quizForm: [{
