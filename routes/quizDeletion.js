@@ -13,7 +13,8 @@ router.delete('/deleteQuiz/:quizId', async (req, res) => {
     
     const quizId = req.params.quizId;
 
-    const deleteResult = await collection.deleteOne({_id: new ObjectId(quizId)});
+    // Quiz deletion via quizId
+    const deleteResult = await collection.deleteOne({ _id: new ObjectId(quizId) });
 
     // Validation for a quizId
     if (!ObjectId.isValid(quizId)) 
@@ -22,7 +23,7 @@ router.delete('/deleteQuiz/:quizId', async (req, res) => {
       return;
     }
 
-    if (deleteResult) 
+    if (deleteResult.acknowledged === true) 
     {
       res.status(200).json({ message: 'Quiz Deletion successful.' });
       console.log(`Successful Quiz Deletion!`)
