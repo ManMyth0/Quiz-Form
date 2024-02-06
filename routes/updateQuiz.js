@@ -19,7 +19,7 @@ router.patch('/updateQuiz/:quizId/:questionId?', async (req, res) => {
 
         if (questionId) 
         {
-            // Update existing question an ensure correct data structure
+            // Update existing question and ensure correct data structure
             const updateResult = await collection.findOneAndUpdate(
                 { _id: new ObjectId(quizId), 'quizForm._id': new ObjectId(questionId) },
                 {
