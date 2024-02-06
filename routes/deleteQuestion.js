@@ -21,13 +21,13 @@ router.delete('/deleteQuestion/:quizId/:questionId', async (req, res) => {
       return;
     }
 
-    // Using $pull to remove the nested object from the collection
+    // Using $pull to remove the nested object's question and contents from the collection
     const deleteResult = await collection.updateOne(
       { _id: new ObjectId(quizId) },
       { $pull: { quizForm: { _id: new ObjectId(questionId) } } }
     );
 
-    if (deleteResult) 
+    if (deleteResult.acknowledged === true) 
     {
       res.status(200).json({ message: 'Deletion successful.' });
       console.log(`Successful Deletion!`)
