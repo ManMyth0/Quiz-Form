@@ -1,4 +1,4 @@
-/* I've placed all the functions linked to the viewQuiz's file buttons here, in a single file, rather than a bunch of smaller files. This just for convenience
+/* I've placed all the functions linked to the viewQuiz file's buttons here, in a single file, rather than a bunch of smaller files. This just for convenience
     so this file might look junky. */
 
     async function getQuizData() {
@@ -151,7 +151,7 @@
           
           else 
           {
-            alert(`Failed to fetch all quizzes: ${returnedData.message}`);
+            alert(`Failed to fetch all quizzes: ${ returnedData.message }`);
             console.error('Failed to fetch all quizzes:', returnedData.message);
           }
         } 
@@ -301,7 +301,7 @@
               fakeAnswers: updatedFakeAnswers
             };
       
-            const response = await fetch(`/updateQuiz/${storedQuizId}/${questionId}`, {
+            const response = await fetch(`/updateQuiz/${ storedQuizId }/${ questionId }`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
@@ -311,7 +311,7 @@
       
             if (response.ok) 
             {
-              alert(`Successfully updated question ${questionIndex} in the Quiz!`);
+              alert(`Successfully updated question ${ questionIndex } in the Quiz!`);
       
               const updateAnother = confirm('Do you want to update another question?');
       
@@ -381,8 +381,8 @@
         const response = await fetch(`/deleteQuestion/${ storedQuizId }/${ questionId }`, {
           method: 'DELETE',
         });
-    
-        if (response) 
+
+        if (response.ok === true) 
         {
           alert(`Successfully deleted question ${ questionIndex } from the Quiz!`);
         } 
@@ -433,11 +433,11 @@
       
             else
             {
-              const response = await fetch(`/deleteQuiz/${storedQuizId}`, {
+              const response = await fetch(`/deleteQuiz/${ storedQuizId }`, {
                  method: 'DELETE',
               });
-      
-              if (response) 
+
+              if (response.ok) 
               {
                 alert(`Successfully deleted the Quiz: ${ quizName } from the collection!`);
               } 
